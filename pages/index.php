@@ -9,50 +9,54 @@
     <script src="https://unpkg.com/alpinejs" defer></script>
 </head>
 
-<body class="flex flex-col gap-8 m-8" x-data="chartApp()">
-    <h1 class="text-4xl font-bold">Graphy</h1>
-    <p>Bon retour sur Graphy !</p>
+<body x-data="chartApp()">
+    <main class="flex flex-col gap-8 m-16">
+        <h1 class=" text-4xl font-bold">Graphy</h1>
+        <p>Bon retour sur Graphy !</p>
 
-    <form @submit.prevent="generateChart" class="flex flex-col gap-4">
-        <div>
-            <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
-                <div class="mb-4 p-4 border rounded bg-gray-100">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
-                        <button type="button" class="p-2 bg-red-500 text-white rounded" @click="removeDataset(datasetIndex)">Supprimer</button>
+        <form @submit.prevent="generateChart" class="flex flex-col gap-4">
+            <div>
+                <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
+                    <div class="mb-4 p-4 border rounded bg-gray-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
+                            <button type="button" class="p-2 bg-red-500 text-white rounded" @click="removeDataset(datasetIndex)">Supprimer</button>
+                        </div>
+                        <div>
+                            <label for="chartType" class="block">Type de graphique:</label>
+                            <select x-model="dataset.type" class="p-2 border rounded">
+                                <option value="bar">Bar</option>
+                                <option value="line">Line</option>
+                                <option value="pie">Pie</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="polarArea">Polar Area</option>
+                            </select>
+                        </div>
+                        <div class="mt-2">
+                            <label class="block">Étiquettes et Données:</label>
+                            <template x-for="(label, index) in dataset.labels" :key="index">
+                                <div class="flex items-center mb-2">
+                                    <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" placeholder="Étiquette">
+                                    <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" placeholder="Valeur">
+                                </div>
+                            </template>
+                            <button type="button" class="p-2 bg-green-300 text-white rounded w-full" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
+                        </div>
                     </div>
-                    <div>
-                        <label for="chartType" class="block">Type de graphique:</label>
-                        <select x-model="dataset.type" class="p-2 border rounded">
-                            <option value="bar">Bar</option>
-                            <option value="line">Line</option>
-                            <option value="pie">Pie</option>
-                            <option value="doughnut">Doughnut</option>
-                            <option value="polarArea">Polar Area</option>
-                        </select>
-                    </div>
-                    <div class="mt-2">
-                        <label class="block">Étiquettes et Données:</label>
-                        <template x-for="(label, index) in dataset.labels" :key="index">
-                            <div class="flex items-center mb-2">
-                                <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" placeholder="Étiquette">
-                                <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" placeholder="Valeur">
-                            </div>
-                        </template>
-                        <button type="button" class="p-2 bg-green-300 text-white rounded w-full" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
-                    </div>
-                </div>
-            </template>
-            <button type="button" class="p-2 bg-green-500 text-white rounded w-full" @click="addDataset">Ajouter un set de données</button>
-        </div>
-        <button type="submit" class="p-2 bg-blue-500 text-white rounded w-full mt-4">Créer le graphique</button>
-    </form>
+                </template>
+                <button type="button" class=" bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
 
-    <div class="grid grid-cols-1 gap-8 mt-8">
-        <div>
-            <canvas id="userChart"></canvas>
+            </div>
+            <button type="submit" class=" bg-blue-500 text-white rounded w-fit px-4 py-2">Créer le graphique</button>
+
+        </form>
+
+        <div class="grid grid-cols-1 gap-8 mt-8">
+            <div>
+                <canvas id="userChart"></canvas>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -60,8 +64,8 @@
             return {
                 datasets: [{
                     type: 'bar',
-                    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
-                    data: [12, 19, 3, 5, 2, 3]
+                    labels: [''],
+                    data: ['']
                 }],
                 chartInstance: null,
                 addDataset() {
