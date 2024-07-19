@@ -10,16 +10,23 @@
 </head>
 
 <body x-data="chartApp()">
-    <main class="flex flex-col gap-8 m-16">
+    <main class="flex flex-col gap-8 m-4 rounded-lg p-8">
         <h1 class=" text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
 
         <form @submit.prevent="generateChart" class="flex flex-col gap-4">
+            <div class="mb-4">
+                <label for="chartTitle" class="block">Titre du graphique:</label>
+                <input type="text" id="chartTitle" class="p-2 border rounded w-full" x-model="chartTitle" placeholder="Titre du graphique">
+            </div>
             <div>
                 <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
-                    <div class="mb-4 p-4 border rounded bg-gray-100">
+                    <div class="mb-4 p-4 border rounded bg-blue-200/30 border-blue-300">
                         <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
+                            <div>
+                                <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
+                                <input type="text" class="p-2 border rounded mt-2" x-model="dataset.name" placeholder="Nom du dataset">
+                            </div>
                             <button type="button" class="p-2 bg-red-500 text-white rounded" @click="removeDataset(datasetIndex)">Supprimer</button>
                         </div>
                         <div>
@@ -40,7 +47,7 @@
                                     <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" placeholder="Valeur">
                                 </div>
                             </template>
-                            <button type="button" class="p-2 bg-green-300 text-white rounded w-full" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
+                            <button type="button" class="p-2 bg-violet-600/50 border border-violet-700 text-white font-bold rounded" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
                         </div>
                     </div>
                 </template>
@@ -62,7 +69,9 @@
     <script>
         function chartApp() {
             return {
+                chartTitle: '',
                 datasets: [{
+                    name: 'Dataset 1',
                     type: 'bar',
                     labels: [''],
                     data: ['']
@@ -70,6 +79,7 @@
                 chartInstance: null,
                 addDataset() {
                     this.datasets.push({
+                        name: `Dataset ${this.datasets.length + 1}`,
                         type: 'bar',
                         labels: [],
                         data: []
@@ -106,7 +116,7 @@
                             const borderColors = dataset.data.map((_, index) => borderColor[index % borderColor.length]);
 
                             return {
-                                label: `Données ${datasetIndex + 1}`,
+                                label: dataset.name,
                                 data: dataset.data,
                                 backgroundColor: backgroundColors,
                                 borderColor: borderColors,
@@ -129,6 +139,12 @@
                             scales: {
                                 y: {
                                     beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: this.chartTitle
                                 }
                             }
                         }
