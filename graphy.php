@@ -63,17 +63,26 @@ function graphy_save_chart_data()
     global $wpdb;
     $table_name = $wpdb->prefix . 'graphy';
 
-    $data = json_decode(file_get_contents('php://input'), true);
+    $raw_input = file_get_contents('php://input');
+    error_log('Raw input: ' . $raw_input);
 
-    // Ajoutez des logs pour déboguer
+    $data = json_decode($raw_input, true);
+
     if (is_null($data)) {
         error_log('Invalid JSON');
         wp_send_json_error(array('message' => 'Invalid JSON'));
         return;
     }
 
+    // Log the decoded data for debugging
+    error_log('Decoded data: ' . print_r($data, true));
+
     $title = sanitize_text_field($data['data']['title']);
     $datasets = wp_json_encode($data['data']['datasets']);
+
+    // Log the sanitized data
+    error_log('Sanitized title: ' . $title);
+    error_log('Encoded datasets: ' . $datasets);
 
     $result = $wpdb->insert(
         $table_name,
@@ -88,11 +97,13 @@ function graphy_save_chart_data()
     );
 
     if ($result !== false) {
+        error_log('Insert successful');
         wp_send_json_success();
     } else {
         error_log('Database insert error');
         wp_send_json_error(array('message' => 'Database insert error'));
     }
 }
+
 add_action('wp_ajax_save_chart_data', 'graphy_save_chart_data');
 add_action('wp_ajax_nopriv_save_chart_data', 'graphy_save_chart_data');

@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <main class="flex flex-col gap-8 m-4 rounded-lg p-8" x-data="chartApp()">
+    <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="chartApp()">
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
         <form @submit.prevent="generateChart" class="flex flex-col gap-4">
@@ -140,8 +140,9 @@
                 },
                 async saveData() {
                     try {
-                        console.log('Sending data to server:', {
-                            action: 'graphy_save_chart_data',
+                        const payload = {
+                            action: 'wp_ajax_save_chart_data',
+                            security: '<?php echo wp_create_nonce('wp_rest'); ?>',
                             data: {
                                 title: this.chartTitle,
                                 datasets: this.datasets.map(dataset => ({
@@ -153,7 +154,9 @@
                                     }))
                                 }))
                             }
-                        });
+                        };
+
+                        console.log('Sending payload:', payload);
 
                         const response = await fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
                             method: 'POST',
@@ -161,14 +164,7 @@
                                 'Content-Type': 'application/json',
                                 'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
                             },
-                            body: JSON.stringify({
-                                action: 'graphy_save_chart_data',
-                                security: '<?php echo wp_create_nonce('wp_rest'); ?>',
-                                data: {
-                                    title: this.chartTitle,
-                                    datasets: this.datasets
-                                }
-                            })
+                            body: JSON.stringify(payload)
                         });
 
                         if (!response.ok) {
@@ -187,6 +183,8 @@
                         console.error('Erreur:', error);
                     }
                 }
+
+
             };
         }
     </script>
