@@ -26,7 +26,6 @@ function graphy_page()
     require 'pages/index.php';
 }
 
-
 function graphy_create_table()
 {
     global $wpdb;
@@ -55,9 +54,8 @@ function graphy_enqueue_scripts()
         'nonce' => wp_create_nonce('wp_rest')
     ));
 }
-add_action('wp_enqueue_scripts', 'graphy_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 
-// Gestion de l'endpoint AJAX pour enregistrer les données
 function graphy_save_chart_data()
 {
     check_ajax_referer('wp_rest', 'security');
@@ -66,10 +64,18 @@ function graphy_save_chart_data()
     $table_name = $wpdb->prefix . 'graphy';
 
     $data = json_decode(file_get_contents('php://input'), true);
+
+    // Ajoutez des logs pour déboguer
+    if (is_null($data)) {
+        error_log('Invalid JSON');
+        wp_send_json_error(array('message' => 'Invalid JSON'));
+        return;
+    }
+
     $title = sanitize_text_field($data['data']['title']);
     $datasets = wp_json_encode($data['data']['datasets']);
 
-    $wpdb->insert(
+    $result = $wpdb->insert(
         $table_name,
         array(
             'title' => $title,
@@ -81,10 +87,11 @@ function graphy_save_chart_data()
         )
     );
 
-    if ($wpdb->insert_id) {
+    if ($result !== false) {
         wp_send_json_success();
     } else {
-        wp_send_json_error();
+        error_log('Database insert error');
+        wp_send_json_error(array('message' => 'Database insert error'));
     }
 }
 add_action('wp_ajax_save_chart_data', 'graphy_save_chart_data');

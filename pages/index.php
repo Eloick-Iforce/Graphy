@@ -6,14 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphy</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs" defer></script>
 </head>
 
-<body x-data="chartApp()">
-    <main class="flex flex-col gap-8 m-4 rounded-lg p-8">
-        <h1 class=" text-4xl font-bold">Graphy</h1>
+<body>
+    <main class="flex flex-col gap-8 m-4 rounded-lg p-8" x-data="chartApp()">
+        <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
-
         <form @submit.prevent="generateChart" class="flex flex-col gap-4">
             <div class="mb-4">
                 <label for="chartTitle" class="block">Titre du graphique:</label>
@@ -51,21 +49,17 @@
                         </div>
                     </div>
                 </template>
-                <button type="button" class=" bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
-
+                <button type="button" class="bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
             </div>
-            <button type="submit" class=" bg-blue-500 text-white rounded w-fit px-4 py-2">Créer le graphique</button>
-
+            <button type="submit" class="bg-blue-500 text-white rounded w-fit px-4 py-2">Créer le graphique</button>
+            <button type="button" class="bg-blue-500 text-white rounded w-fit px-4 py-2" @click="saveData">Enregistrer les données</button>
         </form>
-
         <div class="grid grid-cols-1 gap-8 mt-8">
             <div>
                 <canvas id="userChart"></canvas>
             </div>
         </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function chartApp() {
             return {
@@ -140,15 +134,58 @@
                                 y: {
                                     beginAtZero: true
                                 }
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: this.chartTitle
-                                }
                             }
                         }
                     });
+                },
+                async saveData() {
+                    try {
+                        console.log('Sending data to server:', {
+                            action: 'graphy_save_chart_data',
+                            data: {
+                                title: this.chartTitle,
+                                datasets: this.datasets.map(dataset => ({
+                                    name: dataset.name,
+                                    type: dataset.type,
+                                    data: dataset.data.map((data, index) => ({
+                                        label: dataset.labels[index],
+                                        value: data
+                                    }))
+                                }))
+                            }
+                        });
+
+                        const response = await fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
+                            },
+                            body: JSON.stringify({
+                                action: 'graphy_save_chart_data',
+                                security: '<?php echo wp_create_nonce('wp_rest'); ?>',
+                                data: {
+                                    title: this.chartTitle,
+                                    datasets: this.datasets
+                                }
+                            })
+                        });
+
+                        if (!response.ok) {
+                            console.error('HTTP error:', response.status, response.statusText);
+                            return;
+                        }
+
+                        const result = await response.json();
+                        console.log('Server response:', result);
+                        if (result.success) {
+                            alert('Données enregistrées avec succès !');
+                        } else {
+                            console.error('Erreur lors de l\'enregistrement:', result.data);
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                    }
                 }
             };
         }
