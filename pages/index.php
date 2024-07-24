@@ -12,25 +12,25 @@
     <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="chartApp()">
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
-        <form id="graphyForm" method="post" class="flex flex-col gap-4">
+        <form id="graphyForm" method="post">
             <?php wp_nonce_field('submit_graphy_data_nonce', 'graphy_nonce_field'); ?>
             <div class="mb-4">
                 <label for="chartTitle" class="block">Titre du graphique:</label>
-                <input type="text" id="chartTitle" class="p-2 border rounded w-full" x-model="chartTitle" placeholder="Titre du graphique">
+                <input type="text" id="chartTitle" class="p-2 border rounded w-full" x-model="chartTitle" name="chartTitle" placeholder="Titre du graphique">
             </div>
-            <div>
+            <div id="datasets">
                 <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
                     <div class="mb-4 p-4 border rounded bg-blue-200/30 border-blue-300">
                         <div class="flex justify-between items-center mb-2">
                             <div>
                                 <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
-                                <input type="text" class="p-2 border rounded mt-2" x-model="dataset.name" placeholder="Nom du dataset">
+                                <input type="text" class="p-2 border rounded mt-2" x-model="dataset.name" :name="'datasets[' + datasetIndex + '][name]'" placeholder="Nom du dataset">
                             </div>
                             <button type="button" class="p-2 bg-red-500 text-white rounded" @click="removeDataset(datasetIndex)">Supprimer</button>
                         </div>
                         <div>
                             <label for="chartType" class="block">Type de graphique:</label>
-                            <select x-model="dataset.type" class="p-2 border rounded">
+                            <select x-model="dataset.type" :name="'datasets[' + datasetIndex + '][type]'" class="p-2 border rounded">
                                 <option value="bar">Bar</option>
                                 <option value="line">Line</option>
                                 <option value="pie">Pie</option>
@@ -42,8 +42,8 @@
                             <label class="block">Étiquettes et Données:</label>
                             <template x-for="(label, index) in dataset.labels" :key="index">
                                 <div class="flex items-center mb-2">
-                                    <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" placeholder="Étiquette">
-                                    <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" placeholder="Valeur">
+                                    <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" :name="'datasets[' + datasetIndex + '][labels][' + index + ']'" placeholder="Étiquette">
+                                    <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" :name="'datasets[' + datasetIndex + '][data][' + index + ']'" placeholder="Valeur">
                                 </div>
                             </template>
                             <button type="button" class="p-2 bg-violet-600/50 border border-violet-700 text-white font-bold rounded" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
@@ -52,7 +52,7 @@
                 </template>
                 <button type="button" class="bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
             </div>
-            <button type="button" class="bg-blue-500 text-white rounded w-fit px-4 py-2" id="saveDataButton">Enregistrer les données</button>
+            <button type="submit" class="bg-blue-500 text-white rounded w-fit px-4 py-2">Enregistrer les données</button>
         </form>
         <div class="grid grid-cols-1 gap-8 mt-8">
             <div>
@@ -140,32 +140,6 @@
                 },
             };
         }
-
-        document.getElementById('saveDataButton').addEventListener('click', function() {
-            const chartTitle = document.getElementById('chartTitle').value;
-            const datasets = chartApp().datasets;
-
-            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'graphy_save_data',
-                        chartTitle: chartTitle,
-                        datasets: datasets,
-                        nonce: document.getElementById('graphy_nonce_field').value
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Données enregistrées avec succès!');
-                    } else {
-                        alert('Une erreur s\'est produite lors de l\'enregistrement des données.');
-                    }
-                });
-        });
     </script>
     <?php wp_footer(); ?>
 </body>

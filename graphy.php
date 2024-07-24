@@ -23,6 +23,9 @@ function graphy_menu()
 
 function graphy_page()
 {
+    if (isset($_POST['chartTitle']) && check_admin_referer('submit_graphy_data_nonce', 'graphy_nonce_field')) {
+        graphy_save_data();
+    }
     require 'pages/index.php';
 }
 
@@ -46,21 +49,18 @@ function graphy_create_table()
 
 register_activation_hook(__FILE__, 'graphy_create_table');
 
-add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 function graphy_enqueue_scripts()
 {
     wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
     wp_enqueue_script('alpinejs', 'https://unpkg.com/alpinejs', array(), null, true);
     wp_enqueue_script('tailwindcss', 'https://cdn.tailwindcss.com', array(), null, true);
 }
+add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 
-add_action('wp_ajax_graphy_save_data', 'graphy_save_data');
 function graphy_save_data()
 {
-    check_ajax_referer('submit_graphy_data_nonce', 'nonce');
-
     if (!current_user_can('manage_options')) {
-        wp_send_json_error('Permissions insuffisantes.');
+        wp_die('Vous n\'avez pas les permissions nécessaires pour accéder à cette page.');
     }
 
     $chart_title = sanitize_text_field($_POST['chartTitle']);
@@ -93,5 +93,6 @@ function graphy_save_data()
         )
     );
 
-    wp_send_json_success();
+    // Redirect or display a success message
+    echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
