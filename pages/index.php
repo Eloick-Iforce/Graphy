@@ -183,8 +183,6 @@
                         console.error('Erreur:', error);
                     }
                 }
-
-
             };
         }
     </script>
