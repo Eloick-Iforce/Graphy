@@ -35,7 +35,7 @@ function graphy_create_table()
     $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         title varchar(255) NOT NULL,
-        dataset_type varchar(50) NOT NULL,
+        dataset_type longtext NOT NULL,
         dataset_data longtext NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
@@ -46,65 +46,52 @@ function graphy_create_table()
 
 register_activation_hook(__FILE__, 'graphy_create_table');
 
+add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 function graphy_enqueue_scripts()
 {
     wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
     wp_enqueue_script('alpinejs', 'https://unpkg.com/alpinejs', array(), null, true);
-    wp_localize_script('alpinejs', 'wpApiSettings', array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('wp_rest')
-    ));
+    wp_enqueue_script('tailwindcss', 'https://cdn.tailwindcss.com', array(), null, true);
 }
-add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 
-function graphy_save_chart_data()
+add_action('wp_ajax_graphy_save_data', 'graphy_save_data');
+function graphy_save_data()
 {
-    check_ajax_referer('wp_rest', 'security');
+    check_ajax_referer('submit_graphy_data_nonce', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Permissions insuffisantes.');
+    }
+
+    $chart_title = sanitize_text_field($_POST['chartTitle']);
+    $datasets = array_map(function ($dataset) {
+        return [
+            'name' => sanitize_text_field($dataset['name']),
+            'type' => sanitize_text_field($dataset['type']),
+            'labels' => array_map('sanitize_text_field', $dataset['labels']),
+            'data' => array_map('floatval', $dataset['data']),
+        ];
+    }, $_POST['datasets']);
+
+    $dataset_type = wp_json_encode(array_column($datasets, 'type'));
+    $dataset_data = wp_json_encode($datasets);
 
     global $wpdb;
     $table_name = $wpdb->prefix . 'graphy';
 
-    $raw_input = file_get_contents('php://input');
-    error_log('Raw input: ' . $raw_input);
-
-    $data = json_decode($raw_input, true);
-
-    if (is_null($data)) {
-        error_log('Invalid JSON');
-        wp_send_json_error(array('message' => 'Invalid JSON'));
-        return;
-    }
-
-    // Log the decoded data for debugging
-    error_log('Decoded data: ' . print_r($data, true));
-
-    $title = sanitize_text_field($data['data']['title']);
-    $datasets = wp_json_encode($data['data']['datasets']);
-
-    // Log the sanitized data
-    error_log('Sanitized title: ' . $title);
-    error_log('Encoded datasets: ' . $datasets);
-
-    $result = $wpdb->insert(
+    $wpdb->insert(
         $table_name,
         array(
-            'title' => $title,
-            'datasets' => $datasets
+            'title' => $chart_title,
+            'dataset_type' => $dataset_type,
+            'dataset_data' => $dataset_data,
         ),
         array(
+            '%s',
             '%s',
             '%s'
         )
     );
 
-    if ($result !== false) {
-        error_log('Insert successful');
-        wp_send_json_success();
-    } else {
-        error_log('Database insert error');
-        wp_send_json_error(array('message' => 'Database insert error'));
-    }
+    wp_send_json_success();
 }
-
-add_action('wp_ajax_save_chart_data', 'graphy_save_chart_data');
-add_action('wp_ajax_nopriv_save_chart_data', 'graphy_save_chart_data');

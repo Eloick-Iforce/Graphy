@@ -5,14 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php wp_head(); ?>
 </head>
 
 <body>
     <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="chartApp()">
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
-        <form @submit.prevent="generateChart" class="flex flex-col gap-4">
+        <form id="graphyForm" method="post" class="flex flex-col gap-4">
+            <?php wp_nonce_field('submit_graphy_data_nonce', 'graphy_nonce_field'); ?>
             <div class="mb-4">
                 <label for="chartTitle" class="block">Titre du graphique:</label>
                 <input type="text" id="chartTitle" class="p-2 border rounded w-full" x-model="chartTitle" placeholder="Titre du graphique">
@@ -51,8 +52,7 @@
                 </template>
                 <button type="button" class="bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
             </div>
-            <button type="submit" class="bg-blue-500 text-white rounded w-fit px-4 py-2">Créer le graphique</button>
-            <button type="button" class="bg-blue-500 text-white rounded w-fit px-4 py-2" @click="saveData">Enregistrer les données</button>
+            <button type="button" class="bg-blue-500 text-white rounded w-fit px-4 py-2" id="saveDataButton">Enregistrer les données</button>
         </form>
         <div class="grid grid-cols-1 gap-8 mt-8">
             <div>
@@ -138,54 +138,36 @@
                         }
                     });
                 },
-                async saveData() {
-                    try {
-                        const payload = {
-                            action: 'wp_ajax_save_chart_data',
-                            security: '<?php echo wp_create_nonce('wp_rest'); ?>',
-                            data: {
-                                title: this.chartTitle,
-                                datasets: this.datasets.map(dataset => ({
-                                    name: dataset.name,
-                                    type: dataset.type,
-                                    data: dataset.data.map((data, index) => ({
-                                        label: dataset.labels[index],
-                                        value: data
-                                    }))
-                                }))
-                            }
-                        };
-
-                        console.log('Sending payload:', payload);
-
-                        const response = await fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-WP-Nonce': '<?php echo wp_create_nonce('wp_rest'); ?>'
-                            },
-                            body: JSON.stringify(payload)
-                        });
-
-                        if (!response.ok) {
-                            console.error('HTTP error:', response.status, response.statusText);
-                            return;
-                        }
-
-                        const result = await response.json();
-                        console.log('Server response:', result);
-                        if (result.success) {
-                            alert('Données enregistrées avec succès !');
-                        } else {
-                            console.error('Erreur lors de l\'enregistrement:', result.data);
-                        }
-                    } catch (error) {
-                        console.error('Erreur:', error);
-                    }
-                }
             };
         }
+
+        document.getElementById('saveDataButton').addEventListener('click', function() {
+            const chartTitle = document.getElementById('chartTitle').value;
+            const datasets = chartApp().datasets;
+
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'graphy_save_data',
+                        chartTitle: chartTitle,
+                        datasets: datasets,
+                        nonce: document.getElementById('graphy_nonce_field').value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Données enregistrées avec succès!');
+                    } else {
+                        alert('Une erreur s\'est produite lors de l\'enregistrement des données.');
+                    }
+                });
+        });
     </script>
+    <?php wp_footer(); ?>
 </body>
 
 </html>
