@@ -130,3 +130,37 @@ function graphy_save_data()
 
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
+
+function graphy_update_chart_data()
+{
+    check_ajax_referer('update_chart_data_nonce', 'security');
+
+    if (isset($_POST['chartId'])) {
+        $chart_id = intval($_POST['chartId']);
+        $chart_title = sanitize_text_field($_POST['title']);
+        $datasets = json_decode(stripslashes($_POST['datasets']), true);
+
+        $dataset_data = wp_json_encode($datasets);
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'graphy';
+
+        $wpdb->update(
+            $table_name,
+            array(
+                'title' => $chart_title,
+                'dataset_data' => $dataset_data,
+            ),
+            array('id' => $chart_id),
+            array(
+                '%s',
+                '%s'
+            ),
+            array('%d')
+        );
+
+        echo 'Graphique mis à jour avec succès.';
+        wp_die();
+    }
+}
+add_action('wp_ajax_update_chart_data', 'graphy_update_chart_data');
