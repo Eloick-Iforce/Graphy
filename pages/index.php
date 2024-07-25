@@ -15,9 +15,9 @@
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
         <div x-data="{ selectedChart: null }">
-            <div class="flex w-96 h-96 gap-4">
+            <div class="flex flex-wrap gap-4">
                 <?php foreach ($charts as $chart) : ?>
-                    <div class="bg-white h-full w-full p-4 shadow rounded">
+                    <div class="bg-white h-96 w-96 p-4 shadow rounded">
                         <h2 class="text-lg font-bold"><?php echo esc_html($chart['title']); ?></h2>
                         <div class="chart-container">
                             <canvas id="chart-<?php echo esc_attr($chart['id']); ?>"></canvas>
