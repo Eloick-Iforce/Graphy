@@ -25,45 +25,20 @@
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 var ctx = document.getElementById('chart-<?php echo esc_attr($chart['id']); ?>').getContext('2d');
-                                var chartData = JSON.parse(<?php echo wp_json_encode($chart['dataset_data']); ?>);
-                                var chartType = JSON.parse(<?php echo wp_json_encode($chart['dataset_type']); ?>);
-
-                                var colors = [
-                                    'rgba(255, 99, 132, 0.2)',
-                                    'rgba(54, 162, 235, 0.2)',
-                                    'rgba(255, 206, 86, 0.2)',
-                                    'rgba(75, 192, 192, 0.2)',
-                                    'rgba(153, 102, 255, 0.2)',
-                                    'rgba(255, 159, 64, 0.2)'
-                                ];
-                                var borderColor = [
-                                    'rgba(255, 99, 132, 1)',
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 206, 86, 1)',
-                                    'rgba(75, 192, 192, 1)',
-                                    'rgba(153, 102, 255, 1)',
-                                    'rgba(255, 159, 64, 1)'
-                                ];
+                                var chartData = <?php echo wp_json_encode($chart['dataset_data']); ?>;
+                                var chartType = <?php echo wp_json_encode($chart['dataset_type']); ?>;
 
                                 new Chart(ctx, {
-                                    type: chartData.map(function(dataset, index) {
-                                        return chartType[index];
-                                    }),
+                                    type: chartType,
                                     data: {
-                                        labels: chartData[0].labels,
-                                        datasets: chartData.map(function(dataset, index) {
-                                            var backgroundColors = dataset.data.map((_, i) => colors[i % colors.length]);
-                                            var borderColors = dataset.data.map((_, i) => borderColor[i % borderColor.length]);
-
-                                            return {
-                                                label: dataset.name,
-                                                data: dataset.data,
-                                                backgroundColor: backgroundColors,
-                                                borderColor: borderColors,
-                                                borderWidth: 1,
-                                                fill: false
-                                            };
-                                        })
+                                        labels: chartData.labels,
+                                        datasets: chartData.datasets.map((dataset, index) => ({
+                                            label: dataset.label,
+                                            data: dataset.data,
+                                            backgroundColor: dataset.backgroundColor || colors[index % colors.length],
+                                            borderColor: dataset.borderColor || borderColor[index % borderColor.length],
+                                            borderWidth: 1
+                                        }))
                                     },
                                     options: {
                                         responsive: true,
