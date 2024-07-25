@@ -46,7 +46,9 @@
                                 ];
 
                                 new Chart(ctx, {
-                                    type: chartType[0],
+                                    type: chartData.map(function(dataset, index) {
+                                        return chartType[index];
+                                    }),
                                     data: {
                                         labels: chartData[0].labels,
                                         datasets: chartData.map(function(dataset, index) {
