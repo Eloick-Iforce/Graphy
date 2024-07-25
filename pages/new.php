@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <?php wp_head(); ?>
 </head>
 
 <body>
     <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="chartApp()">
         <h1 class="text-4xl font-bold">Graphy</h1>
-        <p>Bon retour sur Graphy !</p>
+        <p>Nouveau graphique</p>
         <form id="graphyForm" method="post">
             <?php wp_nonce_field('submit_graphy_data_nonce', 'graphy_nonce_field'); ?>
             <div class="mb-4">
