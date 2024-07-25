@@ -17,10 +17,10 @@
 </head>
 
 <body class="bg-gray-100 p-6">
-    <div x-data="{ selectedChart: null }">
-        <div class="grid grid-cols-1 gap-4">
+    <div x-data="{ selectedChart: null }" class="pt-16">
+        <div class="flex w-96 h-96 gap-4">
             <?php foreach ($charts as $chart) : ?>
-                <div class="bg-white p-4 shadow rounded">
+                <div class="bg-white h-full w-full p-4 shadow rounded">
                     <h2 class="text-lg font-bold"><?php echo esc_html($chart['title']); ?></h2>
                     <div class="chart-container">
                         <canvas id="chart-<?php echo esc_attr($chart['id']); ?>"></canvas>
