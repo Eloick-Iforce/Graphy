@@ -19,6 +19,15 @@ function graphy_menu()
         'dashicons-admin-generic',
         6
     );
+
+    add_submenu_page(
+        'graphy',
+        'New Chart',
+        'New Chart',
+        'manage_options',
+        'graphy-new',
+        'graphy_new_chart'
+    );
 }
 
 function graphy_page()
@@ -26,7 +35,15 @@ function graphy_page()
     if (isset($_POST['chartTitle']) && check_admin_referer('submit_graphy_data_nonce', 'graphy_nonce_field')) {
         graphy_save_data();
     }
+
+    $charts = graphy_get_all_charts();
+
     require 'pages/index.php';
+}
+
+function graphy_new_chart()
+{
+    require 'pages/new.php';
 }
 
 function graphy_create_table()
@@ -48,6 +65,24 @@ function graphy_create_table()
 }
 
 register_activation_hook(__FILE__, 'graphy_create_table');
+
+
+function graphy_get_all_charts()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'graphy';
+    $results = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+    return $results;
+}
+
+function graphy_get_chart($id)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'graphy';
+    $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
+    return $result;
+}
+
 
 function graphy_enqueue_scripts()
 {
@@ -93,6 +128,5 @@ function graphy_save_data()
         )
     );
 
-    // Redirect or display a success message
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
