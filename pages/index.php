@@ -5,7 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphy Charts</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <?php wp_head(); ?>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 p-6">
@@ -14,7 +22,9 @@
             <?php foreach ($charts as $chart) : ?>
                 <div class="bg-white p-4 shadow rounded">
                     <h2 class="text-lg font-bold"><?php echo esc_html($chart['title']); ?></h2>
-                    <canvas id="chart-<?php echo esc_attr($chart['id']); ?>"></canvas>
+                    <div class="chart-container">
+                        <canvas id="chart-<?php echo esc_attr($chart['id']); ?>"></canvas>
+                    </div>
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
                             var ctx = document.getElementById('chart-<?php echo esc_attr($chart['id']); ?>').getContext('2d');
@@ -30,7 +40,8 @@
                                             label: dataset.name,
                                             data: dataset.data,
                                             borderColor: 'rgba(75, 192, 192, 1)',
-                                            borderWidth: 1
+                                            borderWidth: 1,
+                                            fill: false
                                         };
                                     })
                                 },
