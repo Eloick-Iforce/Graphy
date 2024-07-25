@@ -32,10 +32,6 @@ function graphy_menu()
 
 function graphy_page()
 {
-    if (isset($_POST['chartTitle']) && check_admin_referer('submit_graphy_data_nonce', 'graphy_nonce_field')) {
-        graphy_save_data();
-    }
-
     $charts = graphy_get_all_charts();
 
     require 'pages/index.php';
@@ -43,6 +39,9 @@ function graphy_page()
 
 function graphy_new_chart()
 {
+    if (isset($_POST['chartTitle']) && check_admin_referer('submit_graphy_data_nonce', 'graphy_nonce_field')) {
+        graphy_save_data();
+    }
     require 'pages/new.php';
 }
 
