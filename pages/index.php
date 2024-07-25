@@ -8,12 +8,6 @@
     <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <?php wp_head(); ?>
-    <style>
-        .chart-container {
-            position: relative;
-            height: 400px;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-100 p-6">
