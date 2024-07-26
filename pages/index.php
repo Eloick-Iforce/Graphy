@@ -45,18 +45,23 @@
                                     'rgba(255, 159, 64, 1)'
                                 ];
 
+                                var mergedData = chartData.reduce(function(result, dataset) {
+                                    return {
+                                        labels: dataset.labels,
+                                        datasets: result.datasets.concat(dataset.datasets)
+                                    };
+                                });
+
                                 new Chart(ctx, {
-                                    type: chartData.map(function(dataset, index) {
-                                        return chartType[index];
-                                    }),
+                                    type: chartType,
                                     data: {
-                                        labels: chartData[0].labels,
-                                        datasets: chartData.map(function(dataset, index) {
+                                        labels: mergedData.labels,
+                                        datasets: mergedData.datasets.map(function(dataset, index) {
                                             var backgroundColors = dataset.data.map((_, i) => colors[i % colors.length]);
                                             var borderColors = dataset.data.map((_, i) => borderColor[i % borderColor.length]);
 
                                             return {
-                                                label: dataset.name,
+                                                label: dataset.label,
                                                 data: dataset.data,
                                                 backgroundColor: backgroundColors,
                                                 borderColor: borderColors,
