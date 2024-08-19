@@ -23,8 +23,8 @@
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
                             var ctx = document.getElementById('chart-<?php echo esc_attr($chart['id']); ?>').getContext('2d');
-                            var chartData = <?php echo wp_json_encode($chart['dataset_data']); ?>;
-                            var chartType = <?php echo wp_json_encode($chart['dataset_type']); ?>;
+                            var chartData = <?php echo wp_json_encode(json_decode($chart['dataset_data'], true)); ?>;
+                            var chartTypes = <?php echo wp_json_encode(json_decode($chart['dataset_type'], true)); ?>;
 
                             var colors = [
                                 'rgba(255, 99, 132, 0.2)',
@@ -44,7 +44,7 @@
                             ];
 
                             new Chart(ctx, {
-                                type: 'bar',
+                                type: chartTypes[0], // Utilisation du type de graphique correct
                                 data: {
                                     labels: chartData[0].labels,
                                     datasets: chartData.map(function(dataset, index) {
@@ -54,7 +54,7 @@
                                         return {
                                             label: dataset.name,
                                             data: dataset.data,
-                                            type: chartType[index],
+                                            type: chartTypes[index], // Utilisation du type de graphique correct
                                             backgroundColor: backgroundColors,
                                             borderColor: borderColors,
                                             borderWidth: 1,
