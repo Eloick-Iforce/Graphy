@@ -87,7 +87,7 @@ function graphy_enqueue_scripts()
 {
     wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
     wp_enqueue_script('alpinejs', 'https://unpkg.com/alpinejs', array(), null, true);
-    wp_enqueue_script('tailwindcss', 'https://cdn.tailwindcss.com', array(), null, true);
+    wp_enqueue_style('graphy', plugin_dir_url(__FILE__) . 'src/output.css');
 }
 add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
 
