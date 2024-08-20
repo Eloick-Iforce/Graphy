@@ -31,6 +31,9 @@
                                 <button class="h-8 w-8 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeDataset(datasetIndex)"><span class="text-xl">x</span></button>
                                 <h3 class="text-xl font-semibold">Jeu de données <span x-text="datasetIndex + 1"></span></h3>
                             </div>
+                            <div class="w-1/3">
+                                <input type="text" class="w-1/3 p-2 border rounded" x-model="dataset.name" :name="'datasets[' + datasetIndex + '][name]'" placeholder="Nom du jeu de données">
+                            </div>
                             <div class="1/3">
                                 <select x-model="dataset.type" :name="'datasets[' + datasetIndex + '][type]'" class="p-2 border rounded-lg">
                                     <option value="bar">Graphique en barre</option>
