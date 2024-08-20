@@ -9,67 +9,68 @@
 </head>
 
 <body>
-    <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()">
-        <h1 class="text-4xl font-bold">Graphy</h1>
-        <p>Nouveau graphique</p>
-        <form id="graphyForm" method="post">
+    <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()" x-init="generateChart()">
+        <form id="graphyForm" method="post" class="flex flex-col gap-8">
             <?php wp_nonce_field('submit_graphy_data_nonce', 'graphy_nonce_field'); ?>
-            <div class="mb-4">
-                <label for="chartTitle" class="block">Titre du graphique:</label>
-                <input type="text" id="chartTitle" class="p-2 border rounded w-full" x-model="chartTitle" name="chartTitle" placeholder="Titre du graphique">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-black">Nouveau graphique</h1>
+                <div class="flex gap-4">
+                    <button class="p-0 px-2 border-dashed text-blue-500 border-blue-600 bg-blue-100 hover:bg-blue-600 hover:text-white rounded-full" @click="saveChart()"><span class="text-xl">+</span> Sauvegarder</button>
+                    <a href="<?php echo admin_url('admin.php?page=graphy'); ?>" class="p-0 px-2 border text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-sm hover:bg-red-600 hover:text-white"><span class="text-xl">x</span> Annuler</a>
+                </div>
             </div>
-            <div id="datasets">
+            <div class="h-1 mx-8 bg-gray-800 rounded-lg"></div>
+            <div class="w-1/3">
+                <input type="text" id="chartTitle" class="w-1/3" x-model="chartTitle" name="chartTitle" placeholder="Nom du graphique">
+            </div>
+            <div id="datasets" class="flex justify-center gap-8 flex-wrap">
                 <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
-                    <div class="mb-4 p-4 border rounded bg-blue-200/30 border-blue-300">
-                        <div class="flex justify-between items-center mb-2">
-                            <div>
-                                <h3 class="text-lg font-semibold">Dataset <span x-text="datasetIndex + 1"></span></h3>
-                                <input type="text" class="p-2 border rounded mt-2" x-model="dataset.name" :name="'datasets[' + datasetIndex + '][name]'" placeholder="Nom du dataset">
+                    <div class="border border-gray-800 rounded-lg p-4 flex flex-col gap-4 w-[45%]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold">Jeu de données <span x-text="datasetIndex + 1"></span></h3>
+                            <div class="1/3">
+                                <select x-model="dataset.type" :name="'datasets[' + datasetIndex + '][type]'" class="p-2 border rounded-lg">
+                                    <option value="bar">Graphique en barre</option>
+                                    <option value="line">Graphique en Ligne</option>
+                                    <option value="pie">Graphique Pie</option>
+                                    <option value="doughnut">Graphique Doughnut</option>
+                                    <option value="polarArea">Graphique Polar Area</option>
+                                </select>
                             </div>
-                            <button type="button" class="p-2 bg-red-500 text-white rounded" @click="removeDataset(datasetIndex)">Supprimer</button>
                         </div>
+
                         <div>
-                            <label for="chartType" class="block">Type de graphique:</label>
-                            <select x-model="dataset.type" :name="'datasets[' + datasetIndex + '][type]'" class="p-2 border rounded">
-                                <option value="bar">Bar</option>
-                                <option value="line">Line</option>
-                                <option value="pie">Pie</option>
-                                <option value="doughnut">Doughnut</option>
-                                <option value="polarArea">Polar Area</option>
-                            </select>
-                        </div>
-                        <div class="mt-2">
-                            <label class="block">Étiquettes et Données:</label>
+                            <label class="block mb-2">Données:</label>
                             <template x-for="(label, index) in dataset.labels" :key="index">
                                 <div class="flex items-center mb-2">
                                     <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" :name="'datasets[' + datasetIndex + '][labels][' + index + ']'" placeholder="Étiquette">
                                     <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" :name="'datasets[' + datasetIndex + '][data][' + index + ']'" placeholder="Valeur">
+                                    <button type="button" class="p-0 px-2 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeLabelAndData(datasetIndex, index)"><span class="text-xl">x</span></button>
                                 </div>
                             </template>
-                            <button type="button" class="p-2 bg-violet-600 text-white rounded font-bold" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
+                            <button type="button" class="btn-add w-full mt-2 py-2" @click="addLabelAndData(datasetIndex)">+ Ajouter une donnée</button>
                         </div>
                     </div>
                 </template>
-                <button type="button" class="bg-green-500 text-white rounded w-fit px-4 py-2" @click="addDataset">Ajouter un set de données</button>
+
+                <div class="dashed-box flex justify-center items-center w-[45%]">
+                    <button type="button" @click="addDataset" class="border-none bg-transparent p-0 text-2xl">+ Ajouter un jeu de données</button>
+                </div>
             </div>
-            <button type="submit" class="bg-blue-500 text-white rounded w-fit px-4 py-2">Enregistrer les données</button>
         </form>
+
         <div class="grid grid-cols-1 gap-8 mt-8">
             <div>
                 <canvas id="userChart"></canvas>
             </div>
         </div>
     </main>
+
     <script>
         function chartApp() {
             return {
                 chartTitle: '',
-                datasets: [{
-                    name: 'Dataset 1',
-                    type: 'bar',
-                    labels: [''],
-                    data: ['']
-                }],
+                datasets: [],
                 chartInstance: null,
                 addDataset() {
                     this.datasets.push({
@@ -86,34 +87,19 @@
                     this.datasets[datasetIndex].labels.push('');
                     this.datasets[datasetIndex].data.push(0);
                 },
+                removeLabelAndData(datasetIndex, labelIndex) {
+                    this.datasets[datasetIndex].labels.splice(labelIndex, 1);
+                    this.datasets[datasetIndex].data.splice(labelIndex, 1);
+                },
                 generateChart() {
                     const chartData = {
                         labels: this.datasets[0].labels,
-                        datasets: this.datasets.map((dataset, datasetIndex) => {
-                            const colors = [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ];
-                            const borderColor = [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ];
-                            const backgroundColors = dataset.data.map((_, index) => colors[index % colors.length]);
-                            const borderColors = dataset.data.map((_, index) => borderColor[index % borderColor.length]);
-
+                        datasets: this.datasets.map((dataset) => {
                             return {
                                 label: dataset.name,
                                 data: dataset.data,
-                                backgroundColor: backgroundColors,
-                                borderColor: borderColors,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
                                 borderWidth: 1,
                                 type: dataset.type
                             };
