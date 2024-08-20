@@ -53,7 +53,27 @@
                     </div>
                 </template>
                 <div class="border border-dashed border-orange-400 rounded-lg h-96 bg-orange-50 flex justify-center items-center w-[45%]">
-                    <button type="button" @click="addDataset" class="border-none bg-transparent w-full h-full flex justify-center items-center text-2xl"> Ajouter un jeu de données</button>
+                    <button type="button" @click="addDataset" class="button-add border-none bg-transparent w-full h-full flex justify-center items-center text-2xl"> Ajouter un jeu de données</button>
+                    <style>
+                        .button-add {
+                            background-color: transparent;
+                            border: none;
+                            width: 100%;
+                            color: orange;
+                        }
+
+                        .button-add:hover {
+                            background-color: orange;
+                            color: white;
+                        }
+
+                        .button-add:focus {
+                            background-color: transparent;
+                            border: none;
+                            width: 100%;
+                            color: orange;
+                        }
+                    </style>
                 </div>
             </div>
         </form>
