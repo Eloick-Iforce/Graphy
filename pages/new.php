@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="chartApp()">
+    <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()">
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Nouveau graphique</p>
         <form id="graphyForm" method="post">
@@ -46,7 +46,7 @@
                                     <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" :name="'datasets[' + datasetIndex + '][data][' + index + ']'" placeholder="Valeur">
                                 </div>
                             </template>
-                            <button type="button" class="p-2 bg-violet-600/50 border border-violet-700 text-white font-bold rounded" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
+                            <button type="button" class="p-2 bg-violet-600 text-white rounded font-bold" @click="addLabelAndData(datasetIndex)">Ajouter une étiquette et une donnée</button>
                         </div>
                     </div>
                 </template>

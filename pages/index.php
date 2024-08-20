@@ -9,9 +9,10 @@
 </head>
 
 <body class="bg-gray-100 p-6">
-    <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white">
+    <main class="flex flex-col gap-8 m-16 rounded-lg p-8 bg-white" x-data="{ open: false }">
         <h1 class="text-4xl font-bold">Graphy</h1>
         <p>Bon retour sur Graphy !</p>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <div class="flex flex-wrap gap-4">
             <?php foreach ($charts as $chart) : ?>
@@ -44,7 +45,7 @@
                             ];
 
                             new Chart(ctx, {
-                                type: chartTypes[0], // Utilisation du type de graphique correct
+                                type: chartTypes[0],
                                 data: {
                                     labels: chartData[0].labels,
                                     datasets: chartData.map(function(dataset, index) {
@@ -54,7 +55,7 @@
                                         return {
                                             label: dataset.name,
                                             data: dataset.data,
-                                            type: chartTypes[index], // Utilisation du type de graphique correct
+                                            type: chartTypes[index],
                                             backgroundColor: backgroundColors,
                                             borderColor: borderColors,
                                             borderWidth: 1,
