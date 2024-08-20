@@ -52,9 +52,8 @@
                         </div>
                     </div>
                 </template>
-
-                <div class="dashed-box flex justify-center items-center w-[45%]">
-                    <button type="button" @click="addDataset" class="border-none bg-transparent p-0 text-2xl">+ Ajouter un jeu de données</button>
+                <div class="border border-dashed border-orange-400 rounded-lg h-96 bg-orange-50 flex justify-center items-center w-[45%]">
+                    <button type="button" @click="addDataset" class="border-none bg-transparent w-full h-full flex justify-center items-center text-2xl"> Ajouter un jeu de données</button>
                 </div>
             </div>
         </form>

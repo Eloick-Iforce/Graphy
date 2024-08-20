@@ -14,8 +14,8 @@
             <h1 class="text-4xl font-bold text-center">Graphy</h1>
 
             <div class="flex justify-between items-center gap-8 w-full">
-                <h2 class="text-2xl font-bold">Vos graphiques</h2>
-                <a href="<?php echo admin_url('admin.php?page=graphy-new'); ?>" class="py-1 px-4 border-dashed text-purple-500 border-purple-600 bg-purple-100 hover:bg-purple-600 hover:text-white rounded-full flex items-center gap-2 justify-center text-sm"><span class="text-2xl">+</span> Nouveau graphique</a>
+                <h2 class="text-2xl font-light italic">Vos graphiques :</h2>
+                <a href="<?php echo admin_url('admin.php?page=graphy-new'); ?>" class="py-1 px-4 border text-purple-500 border-purple-600 bg-purple-100 hover:bg-purple-600 hover:text-white rounded-full flex items-center gap-2 justify-center text-sm"><span class="text-2xl">+</span> Nouveau graphique</a>
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
