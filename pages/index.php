@@ -26,7 +26,12 @@
                             <h3 class="text-xl font-bold"><?php echo esc_html($chart['title']); ?></h3>
                             <div class="flex gap-2">
                                 <button class="p-0 px-2 border-dashed text-blue-500 border-blue-600 bg-blue-100 hover:bg-blue-600 hover:text-white rounded-full flex items-center gap-2 justify-center text-xs"><span class="text-xl">+</span> Modifier</button>
-                                <button class="p-0 px-2 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white"><span class="text-xl">x</span> Supprimer</button>
+                                <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                                    <?php wp_nonce_field('delete_chart', 'graphy_delete_nonce'); ?>
+                                    <input type="hidden" name="action" value="delete_chart">
+                                    <input type="hidden" name="id" value="<?php echo esc_attr($chart['id']); ?>">
+                                    <button class="p-0 px-2 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white"><span class="text-xl">x</span> Supprimer</button>
+                                </form>
                             </div>
                         </div>
                         <div class="chart-container">

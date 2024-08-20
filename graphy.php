@@ -83,6 +83,36 @@ function graphy_get_chart($id)
 }
 
 
+add_action('admin_post_delete_chart', 'graphy_process_delete_chart');
+
+function graphy_process_delete_chart()
+{
+    if (!isset($_POST['graphy_delete_nonce']) || !wp_verify_nonce($_POST['graphy_delete_nonce'], 'delete_chart')) {
+        wp_die('Nonce verification failed');
+    }
+
+    if (!current_user_can('manage_options')) {
+        wp_die('Unauthorized user');
+    }
+
+    $id = intval($_POST['id']);
+    if ($id > 0) {
+        graphy_delete_chart($id);
+        wp_redirect(admin_url('admin.php?page=graphy'));
+        exit;
+    } else {
+        wp_die('Invalid chart ID');
+    }
+}
+
+function graphy_delete_chart($id)
+{
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'graphy';
+    $wpdb->delete($table_name, ['id' => $id]);
+}
+
 function graphy_enqueue_scripts()
 {
     wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
