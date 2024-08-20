@@ -25,9 +25,12 @@
             </div>
             <div id="datasets" class="flex justify-center gap-8 flex-wrap">
                 <template x-for="(dataset, datasetIndex) in datasets" :key="datasetIndex">
-                    <div class="border border-gray-800 rounded-lg p-4 flex flex-col gap-4 w-[45%]">
+                    <div class="border border-dashed border-gray-800 rounded-lg p-4 flex flex-col gap-4 w-[45%]">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-semibold">Jeu de données <span x-text="datasetIndex + 1"></span></h3>
+                            <div class="flex gap-2 items-center">
+                                <button class="h-8 w-8 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeDataset(datasetIndex)"><span class="text-xl">x</span></button>
+                                <h3 class="text-xl font-semibold">Jeu de données <span x-text="datasetIndex + 1"></span></h3>
+                            </div>
                             <div class="1/3">
                                 <select x-model="dataset.type" :name="'datasets[' + datasetIndex + '][type]'" class="p-2 border rounded-lg">
                                     <option value="bar">Graphique en barre</option>
