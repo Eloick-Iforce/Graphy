@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graphy</title>
+    <title>Modifier Graphique</title>
     <?php wp_head(); ?>
 </head>
 
 <body>
-    <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()" x-init="generateChart()">
+    <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()" x-init="loadChartData()">
         <form id="graphyForm" method="post" class="flex flex-col gap-8">
-            <?php wp_nonce_field('submit_graphy_data_nonce', 'graphy_nonce_field'); ?>
+            <?php wp_nonce_field('modify_graphy_data_nonce', 'graphy_nonce_field'); ?>
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-black">Nouveau graphique</h1>
+                <h1 class="text-2xl font-bold text-black">Modifier graphique</h1>
                 <div class="flex gap-4">
-                    <button class="p-0 px-2 border-dashed text-blue-500 border-blue-600 bg-blue-100 hover:bg-blue-600 hover:text-white rounded-full" @click="saveChart()"><span class="text-xl">+</span> Sauvegarder</button>
+                    <button type="submit" class="p-0 px-2 border-dashed text-blue-500 border-blue-600 bg-blue-100 hover:bg-blue-600 hover:text-white rounded-full"><span class="text-xl">+</span> Sauvegarder</button>
                     <a href="<?php echo admin_url('admin.php?page=graphy'); ?>" class="p-0 px-2 border text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-sm hover:bg-red-600 hover:text-white"><span class="text-xl">x</span> Annuler</a>
                 </div>
             </div>
@@ -28,7 +28,7 @@
                     <div class="border border-dashed border-gray-800 rounded-lg p-4 flex flex-col gap-4 w-[45%]">
                         <div class="flex justify-between items-center mb-4">
                             <div class="flex gap-2 items-center">
-                                <button class="h-8 w-8 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeDataset(datasetIndex)"><span class="text-xl">x</span></button>
+                                <button type="button" class="h-8 w-8 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeDataset(datasetIndex)"><span class="text-xl">x</span></button>
                                 <h3 class="text-xl font-semibold">Jeu de données <span x-text="datasetIndex + 1"></span></h3>
                             </div>
                             <div class="w-1/3">
@@ -44,11 +44,10 @@
                                 </select>
                             </div>
                         </div>
-
                         <div>
                             <label class="block mb-2">Données:</label>
                             <template x-for="(label, index) in dataset.labels" :key="index">
-                                <div class="flex items-center mb-2 divide-x divide-gray-800">
+                                <div class="flex items-center mb-2">
                                     <input type="text" class="p-2 border rounded w-1/2 mr-2" x-model="dataset.labels[index]" :name="'datasets[' + datasetIndex + '][labels][' + index + ']'" placeholder="Étiquette">
                                     <input type="number" class="p-2 border rounded w-1/2" x-model="dataset.data[index]" :name="'datasets[' + datasetIndex + '][data][' + index + ']'" placeholder="Valeur">
                                     <button type="button" class="p-0 px-2 border-dashed text-red-500 border-red-600 bg-red-100 rounded-full flex items-center gap-2 justify-center text-xs hover:bg-red-600 hover:text-white" @click="removeLabelAndData(datasetIndex, index)"><span class="text-xl">x</span></button>
@@ -58,7 +57,7 @@
                         </div>
                     </div>
                 </template>
-                <div class="border border-dashed border-spacing-96 border-orange-400 rounded-lg h-96 bg-orange-50 flex justify-center items-center w-[45%]">
+                <div class="border border-dashed border-orange-400 rounded-lg h-96 bg-orange-50 flex justify-center items-center w-[45%]">
                     <button type="button" @click="addDataset" class="button-add border-none bg-transparent w-full h-full flex justify-center items-center text-2xl"> Ajouter un jeu de données</button>
                     <style>
                         .button-add {
@@ -116,9 +115,16 @@
                     this.datasets[datasetIndex].labels.splice(labelIndex, 1);
                     this.datasets[datasetIndex].data.splice(labelIndex, 1);
                 },
+                loadChartData() {
+                    <?php if (isset($_GET['id']) && $chart = graphy_get_chart(intval($_GET['id']))) : ?>
+                        this.chartTitle = <?php echo json_encode($chart['title']); ?>;
+                        this.datasets = <?php echo wp_json_encode(json_decode($chart['dataset_data'], true)); ?>;
+                        this.generateChart();
+                    <?php endif; ?>
+                },
                 generateChart() {
                     const chartData = {
-                        labels: this.datasets[0].labels,
+                        labels: this.datasets.length > 0 ? this.datasets[0].labels : [],
                         datasets: this.datasets.map((dataset) => {
                             return {
                                 label: dataset.name,
@@ -138,7 +144,7 @@
                     }
 
                     this.chartInstance = new Chart(ctx, {
-                        type: this.datasets[0].type,
+                        type: this.datasets.length > 0 ? this.datasets[0].type : 'bar',
                         data: chartData,
                         options: {
                             scales: {

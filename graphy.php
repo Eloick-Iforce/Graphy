@@ -159,3 +159,54 @@ function graphy_save_data()
 
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
+
+
+
+add_action('admin_post_graphy_update_chart', 'graphy_process_update_chart');
+
+function graphy_process_update_chart()
+{
+    if (!isset($_POST['graphy_nonce_field']) || !wp_verify_nonce($_POST['graphy_nonce_field'], 'modify_graphy_data_nonce')) {
+        wp_die('Nonce verification failed');
+    }
+
+    if (!current_user_can('manage_options')) {
+        wp_die('Unauthorized user');
+    }
+
+    $chart_id = intval($_POST['chart_id']);
+    $chart_title = sanitize_text_field($_POST['chartTitle']);
+    $datasets = array_map(function ($dataset) {
+        return [
+            'name' => sanitize_text_field($dataset['name']),
+            'type' => sanitize_text_field($dataset['type']),
+            'labels' => array_map('sanitize_text_field', $dataset['labels']),
+            'data' => array_map('floatval', $dataset['data']),
+        ];
+    }, $_POST['datasets']);
+
+    $dataset_type = wp_json_encode(array_column($datasets, 'type'));
+    $dataset_data = wp_json_encode($datasets);
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'graphy';
+
+    $wpdb->update(
+        $table_name,
+        array(
+            'title' => $chart_title,
+            'dataset_type' => $dataset_type,
+            'dataset_data' => $dataset_data,
+        ),
+        array('id' => $chart_id),
+        array(
+            '%s',
+            '%s',
+            '%s'
+        ),
+        array('%d')
+    );
+
+    wp_redirect(admin_url('admin.php?page=graphy'));
+    exit;
+}
