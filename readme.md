@@ -1,7 +1,7 @@
 # Graphy Plugin
 ## Description
 
-The Graphy plugin is designed to display interactive charts on your WordPress site. It utilizes the Chart.js JavaScript library to generate attractive and customizable charts.
+The Graphy plugin is designed to display interactive charts on your WordPress site. It utilizes the Chart.js JavaScript library to generate attractive and customizable charts. It use TailwindCSS and AlpineJS too.
 ## Features
 
     Display different types of charts, such as bar charts, pie charts, and line charts.
