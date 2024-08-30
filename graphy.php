@@ -175,7 +175,6 @@ function graphy_save_data()
     );
 
     wp_redirect(admin_url('admin.php?page=graphy'));
-
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
 
@@ -243,11 +242,10 @@ function graphy_process_update_chart()
 
 add_action('admin_post_graphy_update_chart', 'graphy_process_update_chart');
 
-// Register the widget with Elementor
 function register_graphy_widget($widgets_manager)
 {
     if (!did_action('elementor/loaded')) {
-        return; // Elementor is not loaded yet
+        return;
     }
 
     require_once(__DIR__ . '/widget/graphy-widget.php');

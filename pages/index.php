@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="chart-container">
+                        <div class="chart-container h-full">
                             <canvas id="chart-<?php echo esc_attr($chart['id']); ?>"></canvas>
                         </div>
                         <div id="chart-data-<?php echo esc_attr($chart['id']); ?>" class="hidden"><?php echo htmlspecialchars(json_encode($chart['dataset_data'])); ?></div>
@@ -79,15 +79,11 @@
                                     data: {
                                         labels: chartData[0].labels,
                                         datasets: chartData.map(function(dataset, index) {
-                                            var backgroundColors = dataset.data.map((_, i) => colors[i % colors.length]);
-                                            var borderColors = dataset.data.map((_, i) => borderColor[i % borderColor.length]);
 
                                             return {
                                                 label: dataset.name,
                                                 data: dataset.data,
                                                 type: chartTypes[index],
-                                                backgroundColor: backgroundColors,
-                                                borderColor: borderColors,
                                                 borderWidth: 1,
                                                 fill: false
                                             };
