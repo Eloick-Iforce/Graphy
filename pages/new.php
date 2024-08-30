@@ -41,6 +41,8 @@
                                     <option value="pie">Graphique Pie</option>
                                     <option value="doughnut">Graphique Doughnut</option>
                                     <option value="polarArea">Graphique Polar Area</option>
+                                    <option value="scatter">Graphique Scatter</option>
+
                                 </select>
                             </div>
                         </div>

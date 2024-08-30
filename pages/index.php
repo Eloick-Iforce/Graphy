@@ -105,36 +105,54 @@
                                 });
                             });
 
-                            function convertToCSV(objArray) {
-                                var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-                                var str = '';
-                                for (var i = 0; i < array.length; i++) {
-                                    var line = '';
-                                    for (var index in array[i]) {
-                                        if (line != '') line += ','
-
-                                        line += array[i][index];
-                                    }
-                                    str += line + '\n';
-                                }
-                                return str;
-                            }
-
                             function exportChartToCSV(chartId) {
-                                var chartData = JSON.parse(document.getElementById('chart-data-' + chartId).innerText);
-                                var csvData = chartData.map(dataset => ({
-                                    "Dataset Name": dataset.name,
-                                    "Data": dataset.data.join(",")
-                                }));
+                                var chartDataElement = document.getElementById('chart-data-' + chartId);
+                                var chartData = JSON.parse(chartDataElement.innerText);
+
+                                console.log("Raw chartData:", chartData);
+
+                                if (!Array.isArray(chartData)) {
+                                    console.error("chartData is not an array!", chartData);
+                                    chartData = convertToCSV(chartData).split("\n").map(line => line.split(","));
+                                    console.log("Converted chartData:", chartData);
+                                    return csvData = chartData.map(dataset => {
+                                        return {
+                                            "Dataset Name": dataset[0],
+                                            "Labels": dataset[1],
+                                            "Data": dataset[2]
+                                        };
+                                    });
+                                } else {
+                                    return;
+                                }
+
+
+
+                                console.log("Formatted csvData:", csvData);
 
                                 var csvContent = "data:text/csv;charset=utf-8," + convertToCSV(csvData);
                                 var encodedUri = encodeURI(csvContent);
+
                                 var link = document.createElement("a");
                                 link.setAttribute("href", encodedUri);
                                 link.setAttribute("download", `chart_${chartId}.csv`);
                                 document.body.appendChild(link);
                                 link.click();
                                 document.body.removeChild(link);
+                            }
+
+                            function convertToCSV(objArray) {
+                                var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+                                var str = '';
+                                for (var i = 0; i < array.length; i++) {
+                                    var line = '';
+                                    for (var index in array[i]) {
+                                        if (line != '') line += ',';
+                                        line += array[i][index];
+                                    }
+                                    str += line + '\n';
+                                }
+                                return str;
                             }
 
                             function exportChartToPNG(chartId) {

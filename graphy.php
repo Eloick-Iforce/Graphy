@@ -120,6 +120,7 @@ function graphy_enqueue_scripts()
     wp_enqueue_style('graphy', plugin_dir_url(__FILE__) . 'src/output.css');
 }
 add_action('admin_enqueue_scripts', 'graphy_enqueue_scripts');
+add_action('wp_enqueue_scripts', 'graphy_enqueue_scripts'); // Add this line to enqueue scripts on the frontend
 
 function graphy_save_data()
 {
@@ -157,12 +158,12 @@ function graphy_save_data()
         )
     );
 
+    wp_redirect(admin_url('admin.php?page=graphy'));
+
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
 
 
-
-add_action('admin_post_graphy_update_chart', 'graphy_process_update_chart');
 
 function graphy_process_update_chart()
 {
@@ -170,9 +171,6 @@ function graphy_process_update_chart()
         wp_die('Nonce verification failed');
     }
 
-    if (!current_user_can('manage_options')) {
-        wp_die('Unauthorized user');
-    }
 
     $chart_id = intval($_POST['chart_id']);
     $chart_title = sanitize_text_field($_POST['chartTitle']);
@@ -210,3 +208,17 @@ function graphy_process_update_chart()
     wp_redirect(admin_url('admin.php?page=graphy'));
     exit;
 }
+
+add_action('admin_post_graphy_update_chart', 'graphy_process_update_chart');
+
+// Register the widget with Elementor
+function register_graphy_widget($widgets_manager)
+{
+    if (!did_action('elementor/loaded')) {
+        return; // Elementor is not loaded yet
+    }
+
+    require_once(__DIR__ . '/widget/graphy-widget.php');
+    $widgets_manager->register_widget_type(new \Graphy_Widget());
+}
+add_action('elementor/widgets/widgets_registered', 'register_graphy_widget');
