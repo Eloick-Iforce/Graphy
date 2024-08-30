@@ -28,11 +28,27 @@ function graphy_menu()
         'graphy-new',
         'graphy_new_chart'
     );
+
+    add_submenu_page(
+        null, // Caché du menu
+        'Modifier Graphique',
+        'Modifier Graphique',
+        'manage_options',
+        'graphy-modify',
+        'graphy_modify_chart'
+    );
 }
 
 function graphy_page()
 {
     $charts = graphy_get_all_charts();
+
+    foreach ($charts as &$chart) {
+        $chart['edit_link'] = wp_nonce_url(
+            admin_url('admin.php?page=graphy-modify&id=' . $chart['id']),
+            'edit_graphy_chart_' . $chart['id']
+        );
+    }
 
     require 'pages/index.php';
 }
@@ -163,7 +179,20 @@ function graphy_save_data()
     echo '<div class="updated notice"><p>Données enregistrées avec succès !</p></div>';
 }
 
+function graphy_modify_chart()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(__('Vous n\'avez pas les permissions nécessaires pour accéder à cette page.'));
+    }
 
+    if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+        wp_die(__('Identifiant de graphique invalide.'));
+    }
+
+    $chart_id = intval($_GET['id']);
+
+    require 'pages/modify.php';
+}
 
 function graphy_process_update_chart()
 {
@@ -171,6 +200,9 @@ function graphy_process_update_chart()
         wp_die('Nonce verification failed');
     }
 
+    if (!current_user_can('manage_options')) {
+        wp_die('Vous n\'avez pas les permissions nécessaires pour accéder à cette page.');
+    }
 
     $chart_id = intval($_POST['chart_id']);
     $chart_title = sanitize_text_field($_POST['chartTitle']);

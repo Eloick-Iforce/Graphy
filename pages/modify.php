@@ -10,8 +10,10 @@
 
 <body>
     <main class="flex flex-col gap-8 rounded-lg p-8 bg-white" x-data="chartApp()" x-init="loadChartData()">
-        <form id="graphyForm" method="post" class="flex flex-col gap-8">
+        <form id="graphyForm" method="post" action="<?php echo admin_url('admin-post.php'); ?>" class="flex flex-col gap-8">
             <?php wp_nonce_field('modify_graphy_data_nonce', 'graphy_nonce_field'); ?>
+            <input type="hidden" name="action" value="graphy_update_chart">
+            <input type="hidden" name="chart_id" value="<?php echo intval($_GET['id']); ?>">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold text-black">Modifier graphique</h1>
                 <div class="flex gap-4">
