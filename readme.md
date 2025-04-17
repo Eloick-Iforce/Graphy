@@ -5,7 +5,7 @@ The Graphy plugin is designed to display interactive charts on your WordPress si
 ## Features
 
     Display different types of charts, such as bar charts, pie charts, and line charts.
-    Save them in the wordpress db
+    Save them in the wordpress db.
 
 ## Installation
 
